@@ -90,26 +90,4 @@ CodeTracker/
 * **app.js** — Express server & route setup
 * **sample.html** — basic frontend form for testing
 
-## Contributing
 
-1. Fork this repository
-2. Create a feature branch
-
-   ```bash
-   git checkout -b feature/your-feature
-   ```
-3. Commit your changes
-
-   ```bash
-   git commit -m "feat: add awesome feature"
-   ```
-4. Push to your fork
-
-   ```bash
-   git push origin feature/your-feature
-   ```
-5. Open a Pull Request
-
-## License
-
-This project is released under the [MIT License](https://opensource.org/licenses/MIT).
