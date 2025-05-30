@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>AtCoder Profile Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 30px; }
+    input, button { padding: 10px; font-size: 16px; }
+    #profile, #submissions { margin-top: 20px; }
+    .chart-container { margin-top: 40px; overflow-x: auto; }
+    .submission { margin-bottom: 10px; padding: 10px; background: #e0ffe0; border-radius: 5px; }
+  </style>
+</head>
+<body>
+
+<h1>AtCoder Profile Dashboard</h1>
+
+<input type="text" id="handle" placeholder="Enter AtCoder user ID">
+<button onclick="fetchProfileData()">Get Profile Data</button>
+
+<div id="profile"></div>
+
+<div class="chart-container">
+  <canvas id="ratingChart" height="200"></canvas>
+</div>
+
+<h2>Submission Heatmap</h2>
+<div class="chart-container">
+  <canvas id="heatmapCanvas" width="900" height="120"></canvas>
+</div>
+
+<div id="submissions"></div>
+
+<script>
+async function fetchProfileData() {
+  const user = document.getElementById('handle').value.trim();
+  if (!user) { alert("Please enter a user ID."); return; }
+
+  const profileDiv = document.getElementById('profile');
+  const submissionsDiv = document.getElementById('submissions');
+  const heatmapCanvas = document.getElementById('heatmapCanvas');
+  const heatmapCtx = heatmapCanvas.getContext('2d');
+
+  try {
+    // AtCoder Problems API endpoints
+    const [infoRes, ratingRes, subsRes] = await Promise.all([
+      fetch(`https://kenkoooo.com/atcoder/atcoder-api/v3/user_info?user=${user}`),
+      fetch(`https://kenkoooo.com/atcoder/atcoder-api/v3/user_rating?user=${user}`),
+      fetch(`https://kenkoooo.com/atcoder/atcoder-api/v3/user_submissions?user=${user}`)
+    ]);
+
+    if (!infoRes.ok || !ratingRes.ok || !subsRes.ok) {
+      throw new Error("Could not fetch data from one or more endpoints.");
+    }
+
+    const info = await infoRes.json();
+    const ratings = await ratingRes.json();
+    const subs = await subsRes.json();
+
+    // PROFILE
+    profileDiv.innerHTML = `
+      <h2>Profile</h2>
+      <p><strong>User:</strong> ${info.user_id}</p>
+      <p><strong>Rating:</strong> ${info.rating ?? "Unrated"}</p>
+      <p><strong>Highest:</strong> ${info.highest_rating ?? "N/A"}</p>
+      <p><strong>Rank:</strong> ${info.rank ?? "Unranked"}</p>
+    `;
+
+    // RATING CHART
+    const ctx = document.getElementById('ratingChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ratings.map(r => new Date(r.second * 1000).toLocaleDateString()),
+        datasets: [{
+          label: 'Rating',
+          data: ratings.map(r => r.new_rating),
+          borderColor: 'rgba(75, 192, 192, 1)',
+          backgroundColor: 'rgba(75, 192, 192, 0.2)',
+          fill: true,
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          x: { title: { display: true, text: 'Contest Date' }},
+          y: { title: { display: true, text: 'Rating' }, beginAtZero: false }
+        }
+      }
+    });
+
+    // HEATMAP
+    const acSubs = subs.filter(s => s.result === "AC");
+    const counts = {};
+    acSubs.forEach(s => {
+      const d = new Date(s.epoch_second * 1000).toISOString().slice(0,10);
+      counts[d] = (counts[d] || 0) + 1;
+    });
+
+    const today = new Date(); today.setHours(0,0,0,0);
+    const start = new Date(today); start.setFullYear(start.getFullYear() - 1);
+    let curr = new Date(start);
+    curr.setDate(curr.getDate() - curr.getDay()); // align Sunday
+
+    const weeks = [];
+    while (curr <= today) {
+      const week = [];
+      for (let i = 0; i < 7; i++) {
+        const dstr = curr.toISOString().slice(0,10);
+        week.push({ date: dstr, count: counts[dstr] || 0 });
+        curr.setDate(curr.getDate() + 1);
+      }
+      weeks.push(week);
+    }
+    // draw
+    heatmapCtx.clearRect(0,0,heatmapCanvas.width,heatmapCanvas.height);
+    const cell = 15;
+    weeks.forEach((wk, wi) => {
+      wk.forEach((day, di) => {
+        const intensity = Math.min(day.count/5,1);
+        const green = Math.floor(255 - intensity*155);
+        heatmapCtx.fillStyle = day.count ? `rgb(${green},255,${green})` : "#eee";
+        heatmapCtx.fillRect(wi*(cell+2), di*(cell+2), cell, cell);
+      });
+    });
+
+    // SUBMISSIONS SUMMARY
+    const now = Date.now()/1000;
+    submissionsDiv.innerHTML = `
+      <h2>Submissions</h2>
+      <p><strong>Total:</strong> ${subs.length}</p>
+      <p><strong>Accepted:</strong> ${acSubs.length}</p>
+      <p><strong>Last 7 days AC:</strong> ${acSubs.filter(s=> s.epoch_second >= now-7*24*3600).length}</p>
+      <p><strong>Last 30 days AC:</strong> ${acSubs.filter(s=> s.epoch_second >= now-30*24*3600).length}</p>
+      <h3>Recent 10 AC Submissions</h3>
+      ${acSubs.slice(0,10).map(s=>`
+        <div class="submission">
+          <strong>${s.problem_id}</strong> —
+          <a href="https://atcoder.jp/contests/${s.contest_id}/tasks/${s.problem_id}" target="_blank">View</a><br>
+          <small>${new Date(s.epoch_second*1000).toLocaleString()}</small>
+        </div>
+      `).join('')}
+    `;
+
+  } catch (e) {
+    alert("Error: " + e.message);
+  }
+}
+</script>
+
+</body>
+</html>

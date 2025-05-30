@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Codeforces Profile</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding-top: 80px; /* Prevent content from hiding under navbar */
+      background: url('../images/codeforcesBackground.webp') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(0, 0, 0, 0.6);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      color: white;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+    }
+
+    .nav-links li a {
+      text-decoration: none;
+      color: white;
+      transition: color 0.3s;
+    }
+
+    .nav-links li a:hover {
+      color: #f89b29;
+    }
+
+    .auth-buttons a {
+      color: white;
+      margin-right: 15px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-outline:hover {
+      background: white;
+      color: black;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: white;
+      text-shadow: 0 0 5px black;
+    }
+
+    .chart-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .grid-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 30px 60px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .id-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 30px;
+      padding: 40px 60px;
+      background-color: #f3f5f9;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .id-card {
+      background-color: white;
+      padding: 25px;
+      border-radius: 15px;
+      text-align: center;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .id-card img {
+      width: 100px;
+      margin-bottom: 15px;
+    }
+
+    .id-card a {
+      font-weight: bold;
+      color: #4a00e0;
+      font-size: 1.1rem;
+      text-decoration: underline;
+    }
+
+    p {
+      margin: 6px 0;
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      margin-top: 40px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">CodeTrackr</div>
+      <ul class="nav-links">
+        <li><a href="/userHome">Home</a></li>
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Progress</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <div class="auth-buttons">
+        <a href="/profile"><%=user.username%></a>
+        <button class="btn-outline" onclick="window.location.href='/logout'">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <h1>Codeforces</h1>
+  <h2>codeforces Id : <%= handle %></h2>
+
+  <% let currentRating = 0; %>
+  <% let mx = 0; %>
+  <% let ratingGraphDate = [], ratingGraphRating = []; %>
+  <% for (let i = 0; i < ratings.length; i++) { %>
+    <% ratingGraphDate.push(ratings[i].contestName); %>
+    <% ratingGraphRating.push(ratings[i].newRating); %>
+    <% mx = Math.max(mx, ratings[i].newRating); %>
+    <% currentRating = ratings[i].newRating; %>
+  <% } %>
+
+  <h2>Maximum Rating: <%= mx %></h2>
+  <h2>Current Rating: <%= currentRating %></h2>
+
+  <div class="chart-container">
+    <canvas id="myChart"></canvas>
+  </div>
+
+  <script>
+    const ctx = document.getElementById('myChart');
+    const ratingGraphDate = <%- JSON.stringify(ratingGraphDate) %>;
+    const ratingGraphRating = <%- JSON.stringify(ratingGraphRating) %>;
+
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ratingGraphDate,
+        datasets: [{
+          label: 'Rating',
+          data: ratingGraphRating,
+          borderWidth: 2,
+          borderColor: '#4a00e0',
+          fill: false,
+          tension: 0.2
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
+
+  <h2>Rating Changes of Recent Contests</h2>
+  <div class="grid-section">
+    <% for (let i = ratings.length - 1; i >= Math.max(0, ratings.length - 10); i--) { %>
+      <div class="card">
+        <p><b>Contest:</b> <%= ratings[i].contestName %></p>
+        <p><b>Rank:</b> <%= ratings[i].rank %></p>
+        <p><b>Rating Change:</b> <%= ratings[i].oldRating %> → <%= ratings[i].newRating %></p>
+      </div>
+    <% } %>
+  </div>
+
+  <h2>Recent Submissions</h2>
+  <div class="grid-section">
+    <% for (let i = recentSubmissions.length - 1; i >= Math.max(0, recentSubmissions.length - 10); i--) { %>
+      <div class="card">
+        <p><b>Problem:</b> <%= recentSubmissions[i].problem.name %></p>
+        <p><b>Rating:</b> <%= recentSubmissions[i].problem.rating %></p>
+        <p><b>Tags:</b> <%= recentSubmissions[i].problem.tags.join(', ') %></p>
+      </div>
+    <% } %>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 CodeTrackr. All rights reserved.</p>
+  </footer>
+</body>
+</html>

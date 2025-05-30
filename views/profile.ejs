@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeTrackr</title>
+  <link rel="stylesheet" href="/css/profile.css">
+</head>
+<body>
+
+  <header>
+    <nav class="navbar">
+      <div class="logo">CodeTrackr</div>
+      <ul class="nav-links">
+        <li><a href="/userHome">Home</a></li>
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Progress</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <div class="auth-buttons">
+        <button class="btn-outline" onclick="window.location.href='/logout'">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <section class="profile-section">
+      <div class="profile-card">
+        <h1><%= user.username %></h1>
+        <p><%= user.email %></p>
+      </div>
+    </section>
+  </main>
+
+  <footer>
+    <p>&copy; 2025 CodeTrackr. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

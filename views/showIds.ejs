@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>All IDs</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+      background: #f0f2f5;
+      padding-top: 80px; /* Added padding for fixed navbar */
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(0, 0, 0, 0.8);
+      position: fixed;
+      width: 100%;
+      top: 0;
+      z-index: 1000;
+      backdrop-filter: blur(8px);
+    }
+
+    .logo {
+      font-size: 1.8rem;
+      font-weight: bold;
+      color: #f89b29;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+    }
+
+    .nav-links li a {
+      text-decoration: none;
+      color: white;
+      font-weight: 500;
+      transition: color 0.3s;
+    }
+
+    .nav-links li a:hover {
+      color: #f89b29;
+    }
+
+    .auth-buttons {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .username {
+      color: white;
+      font-weight: 500;
+      text-decoration: none;
+      font-size: 1rem;
+    }
+
+    .btn-outline {
+      padding: 8px 16px;
+      border: 2px solid white;
+      background: transparent;
+      color: white;
+      border-radius: 5px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: 0.3s;
+    }
+
+    .btn-outline:hover {
+      background-color: white;
+      color: black;
+    }
+
+    h1 {
+      margin-bottom: 30px;
+      text-align: center;
+      color: #333;
+      font-size: 2rem;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 20px;
+      padding: 20px;
+    }
+
+    .card {
+      background: white;
+      border-radius: 10px;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      padding: 20px;
+      width: 180px;
+      transition: transform 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    .card img {
+      width: 100px;
+      height: 100px;
+      object-fit: contain;
+    }
+
+    .profile-id {
+      margin-top: 10px;
+      font-weight: bold;
+      color: #555;
+      word-break: break-word;
+      font-size: 1rem;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <nav class="navbar">
+      <div class="logo">CodeTrackr</div>
+      <ul class="nav-links">
+        <li><a href="/userHome">Home</a></li>
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Progress</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <div class="auth-buttons">
+        <a class="username" href="/profile"><%= user.username %></a>
+        <button class="btn-outline" onclick="window.location.href='/logout'">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <h1>Here are all IDs</h1>
+
+    <div class="container">
+      <% allIds.forEach(function(ids) { %>
+        <% 
+          let imageSrc = '/images/leetcode.jpeg'; // default
+          let path='/leetcode';
+          if (ids.platform === 'Codeforces') imageSrc = '/images/codeforces.jpg',path='/codeforces';
+          else if (ids.platform === 'CodeChef') imageSrc = '/images/codechef.webp',path='/codechef';
+          else if (ids.platform === 'AtCoder') imageSrc = '/images/atcoder.webp',path='/atcoder';
+          else if (ids.platform === 'GeeksforGeeks') imageSrc = '/images/gfg.jpeg',path='/geekforgeeks';
+        %>
+    
+        <a href=<%=path%>><div class="card">
+          <img src="<%= imageSrc %>" alt="Platform Image">
+          <div class="profile-id"><%= ids.profileId %></div>
+        </div></a>
+      <% }); %>
+    </div>
+  </main>
+
+</body>
+</html>

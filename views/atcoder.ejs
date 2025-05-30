@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>AtCoder Profile</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding-top: 80px;
+      background: url('../images/codeforcesBackground.webp') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(0, 0, 0, 0.6);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      color: white;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+    }
+
+    .nav-links li a {
+      text-decoration: none;
+      color: white;
+      transition: color 0.3s;
+    }
+
+    .nav-links li a:hover {
+      color: #f89b29;
+    }
+
+    .auth-buttons a {
+      color: white;
+      margin-right: 15px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-outline:hover {
+      background: white;
+      color: black;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: white;
+      text-shadow: 0 0 5px black;
+    }
+
+    .chart-container {
+      max-width: 650px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+
+    .chart-container iframe {
+      display: block;
+      max-width: 100%;
+      margin: 0 auto;
+      padding: 0;
+      height: 250px;
+    }
+
+    .grid-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 30px 60px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      margin-top: 40px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">CodeTrackr</div>
+      <ul class="nav-links">
+        <li><a href="/userHome">Home</a></li>
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Progress</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <div class="auth-buttons">
+        <a href="/profile"><%= user.username %></a>
+        <button class="btn-outline" onclick="window.location.href='/logout'">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <h1>AtCoder</h1>
+  <h2>User ID: <%= profile.user_id %> (Rating: <%= profile.rating ?? 'Unrated' %>)</h2>
+  <h2>Highest Rating: <%= profile.highest_rating ?? 'N/A' %></h2>
+  <h2>Rank: <%= profile.rank ?? 'Unranked' %></h2>
+
+  <% let acDates = [], acRatings = []; %>
+  <% ratingData.forEach(r => { %>
+    <% acDates.push(new Date((r.EndTime || r.second) * 1000).toLocaleDateString()); %>
+    <% acRatings.push(r.NewRating || r.new_rating || 0); %>
+  <% }); %>
+
+  <div class="chart-container">
+    <canvas id="acChart"></canvas>
+  </div>
+
+  <h2>Submission Heatmap</h2>
+  <div class="chart-container">
+    <iframe 
+      src="https://api.allorigins.win/raw?url=https://atcoder-api.vercel.app/heatmap/<%= profile.user_id %>" 
+      width="100%" 
+      height="200" 
+      style="border:none; border-radius:8px; margin:0; padding:0; overflow:hidden;">
+    </iframe>
+  </div>
+
+  <script>
+    const acCtx = document.getElementById('acChart');
+    const acLabels = <%- JSON.stringify(acDates) %>;
+    const acData = <%- JSON.stringify(acRatings) %>;
+
+    new Chart(acCtx, {
+      type: 'line',
+      data: {
+        labels: acLabels,
+        datasets: [{
+          label: 'Rating',
+          data: acData,
+          borderColor: '#ff5722',
+          borderWidth: 2,
+          fill: false,
+          tension: 0.2
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: false }
+        }
+      }
+    });
+  </script>
+
+  <h2>Recent Contests</h2>
+  <div class="grid-section">
+    <% if (ratingData.length > 0) { %>
+      <% for (let i = ratingData.length - 1; i >= Math.max(0, ratingData.length - 10); i--) {
+           const c = ratingData[i]; %>
+        <div class="card">
+          <p><b>Contest:</b> <%= c.ContestName || c.contest_name || 'Unknown Contest' %></p>
+          <p><b>Date:</b> <%= new Date((c.EndTime || c.second || 0) * 1000).toLocaleDateString() %></p>
+          <p><b>New Rating:</b> <%= c.NewRating || c.new_rating || 'N/A' %></p>
+          <p><b>Old Rating:</b> <%= c.OldRating || c.old_rating || 'N/A' %></p>
+        </div>
+      <% } %>
+    <% } else { %>
+      <div class="card">
+        <p>No recent contest data available.</p>
+      </div>
+    <% } %>
+  </div>
+    <!-- Add this section before the footer -->
+  <h2>Recent Successful Submissions</h2>
+  <div class="grid-section">
+    <% if (successfulSubmissions && successfulSubmissions.length > 0) { %>
+      <% successfulSubmissions.forEach(function(sub) { %>
+        <div class="card">
+          <p><b>Problem:</b> <%= sub.problem_id %></p>
+          <p><b>Contest:</b> <%= sub.contest_id %></p>
+          <p><b>Date:</b> <%= new Date(sub.epoch_second * 1000).toLocaleString() %></p>
+          <p><b>Language:</b> <%= sub.language %></p>
+          <p>
+            <a href="https://atcoder.jp/contests/<%= sub.contest_id %>/tasks/<%= sub.problem_id %>" target="_blank">
+              View Problem
+            </a>
+          </p>
+        </div>
+      <% }); %>
+    <% } else { %>
+      <div class="card">
+        <p>No successful submissions found.</p>
+      </div>
+    <% } %>
+  </div>
+  <footer>
+    <p>&copy; 2025 CodeTrackr. All rights reserved.</p>
+  </footer>
+</body>
+</html>

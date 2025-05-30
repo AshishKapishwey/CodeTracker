@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Add Coding IDs</title>
+  <link rel="stylesheet" href="/css/addIds.css">
+</head>
+<body>
+
+
+
+
+<div class="add-ids-container">
+  <div class="left-section">
+    <h2>Connect Your Coding Profiles</h2>
+    <p>Enter your Profile ID and select the Platform.  
+    Stay consistent and track your progress!</p>
+    <img src="/images/idPage.jpg" alt="Coding Profiles" class="side-image">
+    <a href="/userHome" class="back-link">← Back to Home</a>
+  </div>
+
+  <div class="right-section">
+    <form action="/addIds" method="POST" class="id-form">
+      <h2>Add ID</h2>
+
+      <div class="input-group">
+        <label for="platform">Platform</label>
+        <select id="platform" name="platform" required>
+          <option value="">Select Platform</option>
+          <option value="Codeforces">Codeforces</option>
+          <option value="CodeChef">CodeChef</option>
+          <option value="AtCoder">AtCoder</option>
+        </select>
+      </div>
+
+      <div class="input-group">
+        <label for="profileId">Profile ID</label>
+        <input type="text" id="profileId" name="profileId" placeholder="Enter your profile username/ID" required>
+      </div>
+
+      <button type="submit" class="btn-submit">Save ID</button>
+    </form>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeTrackr</title>
+  <link rel="stylesheet" href="/css/userHome.css">
+</head>
+<body>
+
+  <header>
+    <nav class="navbar">
+      <div class="logo">CodeTrackr</div>
+      <ul class="nav-links">
+        <li><a href="/userHome">Home</a></li>
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Progress</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <div class="auth-buttons">
+        <a href="/profile"><%=user.username%></a>
+        <button class="btn-outline" onclick="window.location.href='/logout'">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <!-- Coding Profile Tracking Section -->
+<section class="coding-ids-section">
+  <div class="container ids-content">
+    <div class="text-block">
+      <h2 style="color: black;">Track Your Coding Journey</h2>
+      <p style="color: black;">Stay consistent by linking your coding platform profiles. Watch your growth across LeetCode, Codeforces, CodeChef, and more!</p>
+      <div class="ids-buttons">
+        <button class="btn" onclick="window.location.href='/addIds'">➕ Add IDs</button>
+        <button class="btn-outline" onclick="window.location.href='/showIds'">📋 See Added IDs</button>
+      </div>
+    </div>
+    <div class="image-block">
+      <img src="/images/graph.avif" alt="Track Your Coding Profiles">
+    </div>
+  </div>
+</section>
+
+  
+  <!-- Success Stories Section -->
+  <section class="success-stories">
+    <div class="container stories-content">
+      <div class="text-block">
+        <h2>Success Stories From Our Users</h2>
+        <p>Codetrackr has helped hundreds of coders land internships and jobs by staying consistent. Check out some of their journeys!</p>
+        <button class="btn">Read Stories</button>
+      </div>
+      <div class="image-grid">
+        <img src="users/user1.jpg" alt="User 1">
+        <img src="users/user2.jpg" alt="User 2">
+        <img src="users/user3.jpg" alt="User 3">
+        <img src="users/user4.jpg" alt="User 4">
+        <img src="users/user5.jpg" alt="User 5">
+        <div class="video-preview">
+          <img src="users/user6.jpg" alt="User Video">
+          <div class="play-button">&#9658;</div>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  
+  <footer>
+    <p>&copy; 2025 CodeTrackr. All rights reserved.</p>
+  </footer>
+
+</body>
+</html>

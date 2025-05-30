@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CodeChef Profile</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding-top: 80px;
+      background: url('../images/codeforcesBackground.webp') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+    }
+
+    .navbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 40px;
+      background: rgba(0, 0, 0, 0.6);
+      position: fixed;
+      top: 0;
+      width: 100%;
+      z-index: 1000;
+      color: white;
+    }
+
+    .logo {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
+
+    .nav-links {
+      display: flex;
+      list-style: none;
+      gap: 25px;
+    }
+
+    .nav-links li a {
+      text-decoration: none;
+      color: white;
+      transition: color 0.3s;
+    }
+
+    .nav-links li a:hover {
+      color: #f89b29;
+    }
+
+    .auth-buttons a {
+      color: white;
+      margin-right: 15px;
+      font-weight: bold;
+      text-decoration: none;
+    }
+
+    .btn-outline {
+      background: transparent;
+      color: white;
+      border: 1px solid white;
+      padding: 6px 12px;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .btn-outline:hover {
+      background: white;
+      color: black;
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: white;
+      text-shadow: 0 0 5px black;
+    }
+
+    .chart-container {
+      max-width: 650px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+    }
+    .chart-container iframe {
+  display: block;
+  max-width: 100%;
+  margin: 0 auto;
+  padding: 0;
+  height: 250px;
+}
+
+    .grid-section {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      padding: 30px 60px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.07);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+    }
+
+    footer {
+      text-align: center;
+      padding: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      margin-top: 40px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <nav class="navbar">
+      <div class="logo">CodeTrackr</div>
+      <ul class="nav-links">
+        <li><a href="/userHome">Home</a></li>
+        <li><a href="#">Features</a></li>
+        <li><a href="#">Progress</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+      <div class="auth-buttons">
+        <a href="/profile"><%= user.username %></a>
+        <button class="btn-outline" onclick="window.location.href='/logout'">Logout</button>
+      </div>
+    </nav>
+  </header>
+
+  <h1>CodeChef</h1>
+  <h2>CodeChef ID: <%= profile.name %> ( <%=profile.stars%> )</h2>
+
+  <% let ccDates = [], ccRatings = []; %>
+  <% for (let i = 0; i < profile.ratingData.length; i++) { %>
+    <% ccDates.push(profile.ratingData[i].name); %>
+    <% ccRatings.push(profile.ratingData[i].rating); %>
+  <% } %>
+
+  <h2>Maximum Rating: <%= profile.highestRating %></h2>
+  <h2>Current Rating: <%= profile.currentRating %></h2>
+  <h2>Global Rank: <%= profile.globalRank %></h2>
+  <h2>Country Rank: <%= profile.countryRank %></h2>
+
+  <!-- Chart -->
+  <div class="chart-container">
+    <canvas id="ccChart"></canvas>
+  </div>
+
+  <!-- Heatmap -->
+<h2>Heatmap of Submissions</h2>
+<div class="chart-container">
+  <iframe 
+    src="https://codechef-api.vercel.app/heatmap/<%= profile.name %>" 
+    width="100%" 
+    height="200" 
+    style="border:none; border-radius:8px; margin:0; padding:0; overflow:hidden;">
+  </iframe>
+</div>
+
+  <script>
+    const ccCtx = document.getElementById('ccChart');
+    const ccLabels = <%- JSON.stringify(ccDates) %>;
+    const ccData = <%- JSON.stringify(ccRatings) %>;
+
+    new Chart(ccCtx, {
+      type: 'line',
+      data: {
+        labels: ccLabels,
+        datasets: [{
+          label: 'Rating',
+          data: ccData,
+          borderColor: '#ff5722',
+          borderWidth: 2,
+          fill: false,
+          tension: 0.2
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: {
+            beginAtZero: true
+          }
+        }
+      }
+    });
+  </script>
+
+  <h2>Rating Changes of Recent Contests</h2>
+  <div class="grid-section">
+    <% for (let i = profile.ratingData.length - 1; i >= Math.max(0, profile.ratingData.length - 10); i--) { %>
+      <div class="card">
+        <p><b>Contest:</b> <%= profile.ratingData[i].name %></p>
+        <p><b>Date:</b> <%= profile.ratingData[i].end_date %></p>
+        <p><b>Rank:</b> <%= profile.ratingData[i].rank %></p>
+        <p><b>Rating:</b> <%= profile.ratingData[i].rating %></p>
+      </div>
+    <% } %>
+  </div>
+
+  <footer>
+    <p>&copy; 2025 CodeTrackr. All rights reserved.</p>
+  </footer>
+</body>
+</html>
